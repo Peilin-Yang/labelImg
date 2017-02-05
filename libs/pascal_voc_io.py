@@ -122,10 +122,10 @@ class PascalVocReader:
         return self.shapes
 
     def addShape(self, label, bndbox):
-        xmin = int(bndbox.find('xmin').text)
-        ymin = int(bndbox.find('ymin').text)
-        xmax = int(bndbox.find('xmax').text)
-        ymax = int(bndbox.find('ymax').text)
+        xmin = float(bndbox.find('xmin').text)
+        ymin = float(bndbox.find('ymin').text)
+        xmax = float(bndbox.find('xmax').text)
+        ymax = float(bndbox.find('ymax').text)
         points = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)]
         self.shapes.append((label, points, None, None))
 
@@ -133,7 +133,7 @@ class PascalVocReader:
         assert self.filepath.endswith('.xml'), "Unsupport file format"
         parser = etree.XMLParser(encoding='utf-8')
         xmltree = ElementTree.parse(self.filepath, parser=parser).getroot()
-        filename = xmltree.find('filename').text
+        #filename = xmltree.find('filename').text
 
         for object_iter in xmltree.findall('object'):
             bndbox = object_iter.find("bndbox")

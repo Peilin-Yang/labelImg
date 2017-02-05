@@ -5,6 +5,7 @@ import codecs
 import os.path
 import re
 import sys
+import random
 import subprocess
 
 from functools import partial
@@ -92,6 +93,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.setWindowTitle(__appname__)
         # Save as Pascal voc xml
         self.defaultSaveDir = None
+        self.verifiedDir = None
         self.usingPascalVocFormat = True
         if self.usingPascalVocFormat:
             LabelFile.suffix = '.xml'
@@ -885,7 +887,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     relatviePath = os.path.join(root, file)
                     path = u(os.path.abspath(relatviePath))
                     images.append(path)
-        images.sort(key=lambda x: x.lower())
+        #images.sort(key=lambda x: x.lower())
+        random.shuffle(images)
         return images
 
     def changeSavedir(self, _value=False):
@@ -900,6 +903,12 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if dirpath is not None and len(dirpath) > 1:
             self.defaultSaveDir = dirpath
+
+        # we use another dir to save the verified annotation only...
+        self.verifiedDir = os.path.join(os.path.dirname(self.defaultSaveDir), 
+            os.path.basename(self.defaultSaveDir)+'_verified')
+        if not os.path.exists(self.verifiedDir):
+            os.makedirs(self.verifiedDir)
 
         self.statusBar().showMessage('%s . Annotation will be saved to %s' %('Change saved folder', self.defaultSaveDir))
         self.statusBar().show()
@@ -1005,6 +1014,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 savedFileName = os.path.splitext(imgFileName)[0] + LabelFile.suffix
                 savedPath = os.path.join(str(self.defaultSaveDir), savedFileName)
                 self._saveFile(savedPath)
+                verifiedPath = os.path.join(str(self.verifiedDir), savedFileName)
+                self._saveFile(verifiedPath)
             else:
                 self._saveFile(self.filename if self.labelFile\
                                          else self.saveFileDialog())
